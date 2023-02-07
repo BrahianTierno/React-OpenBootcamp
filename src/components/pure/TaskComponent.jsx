@@ -1,39 +1,77 @@
-import React from 'react'
+import { useEffect }  from 'react'
 import PropTypes from 'prop-types'
 import { Task } from '../../models/task.class'
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
+import '../../style/task.scss'
+import { LEVELS } from '../../models/levels.enum'
 
-const TaskComponent = ({task}) => {
+
+const TaskComponent = ({task,complete,remove}) => {
+
+useEffect(() => {
+   
+  console.log("Created task");
+
+  return () => {
+    console.log(`Task: ${task.name} is going to unmount`);
+  }
+}, [task])
+
+function taskLevelBadge(){
+  switch (task.level) {
+    case LEVELS.NORMAL:
+        return(<h6 className='mb-0'> <span className='badge bg-primary'>{task.level}</span></h6>)
+    case LEVELS.URGENT:
+        return(<h6 className='mb-0'> <span className='badge bg-warning'>{task.level}</span></h6>) 
+    case LEVELS.BLOCKING:
+         return(<h6 className='mb-0'> <span className='badge bg-danger'>{task.level}</span></h6>)
+  
+    default:
+      break;
+  }
+}
+
+function taskIconCompleted(){
+  if(task.completed){
+    return <i onClick={() => complete(task)} className='bi-toggle-on task-action' style={{color:'green', fontWeight:'bold'}}></i>
+  }else{
+    return <i onClick={() => complete(task)} className='bi-toggle-on task-action' style={{color:'gray'}}></i>
+  }
+}
+
+
   return (
-    <Card sx={{ maxWidth: 350 }}>   
-    <CardContent>
-      <Typography gutterBottom variant="h5" component="div">
-        Name:{task.name}
-      </Typography>
-      <Typography variant="body1" color="text.primary">
-       {task.description}
-      </Typography>
-      <Typography variant="h8" color="text.primary">
-       Level:{task.level}
-      </Typography>
-      <Typography variant="h6" color="text.primary">
-       This task is: {task.completed ? 'Completed' : 'Pending'}
-      </Typography>
-    </CardContent>
-    <CardActions>
-      <Button size="small">Share</Button>
-      <Button size="small">Learn More</Button>
-    </CardActions>
-  </Card>
+
+        <tr className='fw-normal'>
+          <th>
+            <span className='ms-2'>{task.name}</span>
+          </th>
+          <td className='align-middle'>
+             <span >{task.description}</span>
+          </td>
+          <td className='align-middle'>
+             <span >{taskLevelBadge()}</span>
+          </td>
+          <td className='align-middle'>       
+              {taskIconCompleted()}
+              <i className='bi-trash task-action' style={{color:'tomato', fontWeight:'bold'}} onClick={() => remove(task)}></i>
+          </td>          
+        </tr>
+
+
+        //<div>
+         // <h2 className='task-name'>Name:</h2>
+       //   <h3>{task.description}</h3>
+          //<h4>Level:{task.level}</h4>
+         // <h5> This task is: {task.completed ? 'Completed' : 'Pending'}</h5>
+        //</div>
+
   )
 }
 
 TaskComponent.propTypes = {
-    task: PropTypes.instanceOf(Task)
+    task: PropTypes.instanceOf(Task).isRequired,
+    complete: PropTypes.func.isRequired,
+    remove : PropTypes.func.isRequired
 }
 
 export default TaskComponent
